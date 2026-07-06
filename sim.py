@@ -1,7 +1,5 @@
 import pygame
-import time
 import sys
-import numpy as np
 pygame.init()
 
 
@@ -29,11 +27,10 @@ vel_x = 0
 on_ground = False
 not_moving = True
 acceleration = 1000
-maxXVel = 1500 #max horizontal velocity
+maxXVel = 800 #max horizontal velocity
 jumpVel = 800 #jump velocity
-tvel = np.sqrt((2 * m * g) / (1.225 * np.pi * (radiusP/100)**2 * 0.47)) #terminal velocity
+tvel = math.sqrt((2 * m * 9.81) / (1.225 * math.pi * (radiusP/100)**2 * 0.47)) #terminal velocity
 μ = 2 #friction coefficient
-
 
 
 def jump():
@@ -77,7 +74,8 @@ while running:
         not_moving = False
         moveX(1)
 
-    if not on_ground: #gravity
+    #gravity
+    if not on_ground: 
         if vel_y < tvel:
                 vel_y += (g * dt)
                 print(f"velocity is {vel_y}")
@@ -87,25 +85,30 @@ while running:
     #friction
     if not_moving and on_ground:
         if vel_x > 10:
-            vel_x -= μ * m * g * dt
+            vel_x -= μ * g * dt
             print(f"Horizontal velocity is {vel_x}")
         if vel_x < -10:
-            vel_x += μ * m * g * dt
+            vel_x += μ * g * dt
             print(f"Horizontal velocity is {vel_x}")
     
+    #move
     x += vel_x * dt
     y += vel_y * dt
 
+    #on ground
     if y >= Height - radiusP:
         y = Height - radiusP
         on_ground = True
         vel_y = 0
-    
+
+    #hit wall
     if x >= Width - radiusP:
         x = Width - radiusP
+        vel_x = 0
     if x <= radiusP:
         x = radiusP
-
+        vel_x = 0
+    #draw
     screen.fill((255, 255, 255))  # white
     pygame.draw.circle(screen, (0, 0, 0), [x, y], radiusP, 0) #black circle
     pygame.display.flip()
