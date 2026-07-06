@@ -5,43 +5,58 @@ import numpy as np
 pygame.init()
 
 
-# variables
-x = 1000
-y = 1000
-pos_x = x / 2
-pos_y = y / 2
-mass = 1 #kg ig
-radius = 10 #cm
+#======================variables===========================
+
+#window
+Width = 1000
+Height = 1000
+
+#time/fps
+clock = pygame.time.Clock()
+FPS = 60
+
+#circle
+x = Width / 2
+y = Height / 2
+radiusM = 0.1 #meter
+radiusP = 10 #radius in pixels
+
+#physics
+m = 1 #kg
 g = 9.81
-dT = pygame.time.Clock().tick(60) / 1000  # convert milliseconds to seconds
-# 1 pixel = 1 m
 vel_y = 0
 vel_x = 0
-gravity = True
-onground = False
-acceleration = 1
-maxX = 20
+on_ground = False
+acceleration = 2
+maxXVel = 100 #max horizontal velocity
+jumpVel = 100 #jump velocity
+tvel = np.sqrt((2 * m * g) / (1.225 * np.pi * (radiusM)**2 * 0.47)) #terminal velocity
+
 def jump():
-    global vel_y, gravity, onground
-    if onground:
-        vel_y = -10
-        onground = False
+    global vel_y, on_ground
+
+    if on_ground:
+        vel_y = -jumpVel 
+        on_ground = False
+
 def moveX(direction):
-    global pos_x, vel_x
-    if vel_x < maxX and vel_x > -maxX:
+    global x, vel_x
+    if vel_x < maxXVel and vel_x > -maxXVel:
         vel_x += acceleration * direction
         print(f"Horizontal velocity is {vel_x}")
     else:
-        vel_x = maxX * direction
+        vel_x = maxXVel * direction
         print(f"Horizontal velocity is {vel_x}")
-    pos_x += vel_x
-    time.sleep(dT)
+    x += vel_x * dt
 
-#region INITIALZATION STUFFS
-screen = pygame.display.set_mode((x, y))
+#setup screen
+screen = pygame.display.set_mode((Width, Height))
 pygame.display.set_caption("gam")
+
+
 running = True
 while running:
+    dt = clock.tick(FPS) / 50
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
@@ -54,32 +69,28 @@ while running:
         moveX(-1)
     if keys[pygame.K_d]:
         moveX(1)
-        if event.type == pygame.QUIT:
-            running = False
-#endregion
 
-    if not onground: #GRAVITY BABY
-        if vel_y < np.sqrt((2 * mass * g) / (1.225 * np.pi * (radius / 100)**2 * 0.47)): #terminal velocity ~ 32.93499424250039
-                vel_y += (g * dT)
+    if not on_ground: #gravity
+        if vel_y < tvel:
+                vel_y += (g * dt)
                 print(f"velocity is {vel_y}")
-                pos_y +=vel_y 
-        time.sleep(dT)
+        else:
+            vel_y = tvel
+            print(f"velocity is {vel_y}")
+        y += vel_y * dt
+        
+    if y >= Height - radiusP:
+        y = Height - radiusP
+        on_ground = True
     
-    if pos_y >= y - radius:
-        pos_y = y - radius
-        onground = True
-    
-    if pos_x >= x - radius:
-        pos_x = x - radius
-    if pos_x <= radius:
-        pos_x = radius
+    if x >= Width - radiusP:
+        x = Width - radiusP
+    if x <= radiusP:
+        x = radiusP
 
-    
-    
-            
-        #region end of  initialization stuffs
     screen.fill((255, 255, 255))  # white
-    pygame.draw.circle(screen, (0, 0, 0), [pos_x, pos_y], radius, 0) #black circle
+    pygame.draw.circle(screen, (0, 0, 0), [x, y], radiusP, 0) #black circle
     pygame.display.flip()
-#endregion
+
 pygame.quit()
+sys.exit()

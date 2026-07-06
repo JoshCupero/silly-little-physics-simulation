@@ -1,2 +1,2 @@
 
-acceleration = 1
+    if keys[pygame.K_a]:
