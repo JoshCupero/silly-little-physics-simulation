@@ -1,5 +1,6 @@
 import pygame
 import sys
+import math
 pygame.init()
 
 
@@ -29,7 +30,7 @@ not_moving = True
 acceleration = 1000
 maxXVel = 800 #max horizontal velocity
 jumpVel = 800 #jump velocity
-tvel = math.sqrt((2 * m * 9.81) / (1.225 * math.pi * (radiusP/100)**2 * 0.47)) #terminal velocity
+tvel = math.sqrt((2 * m * 981) / (1.225 * math.pi * (radiusP/100)**2 * 0.47)) #terminal velocity
 μ = 2 #friction coefficient
 
 
